@@ -10,7 +10,10 @@
 <section class="list-page">
   <div class="list-head">
     <h1 class="page-title">気になる</h1>
+    {# 空のときは下の誘導文に添えたボタンだけを出す。ボタンを2つ並べない #}
+    {% if items %}
     <a class="btn btn--primary" href="{{ url_for('wishes.new') }}">＋ 入れる</a>
+    {% endif %}
   </div>
 
   {% if items %}

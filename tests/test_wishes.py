@@ -115,6 +115,27 @@ def test_wish_list_empty_message_is_inviting(auth_client):
     assert "気になったものを入れておけます" in body
 
 
+def test_wish_list_has_only_one_add_button(auth_client, db, wish):
+    """追加ボタンは常に1つだけ。空のときと項目があるときで出し分ける。"""
+    from app.models import Content
+
+    def count_add_buttons(html):
+        return html.count('href="/wishes/new"')
+
+    # 項目があるとき: ヘッダーの「＋ 入れる」だけ
+    body = auth_client.get("/wishes").get_data(as_text=True)
+    assert count_add_buttons(body) == 1
+    assert "＋ 入れる" in body
+
+    # 空のとき: 誘導文の「入れてみる」だけ
+    db.session.delete(db.session.get(Content, wish.id))
+    db.session.commit()
+    body = auth_client.get("/wishes").get_data(as_text=True)
+    assert count_add_buttons(body) == 1
+    assert "入れてみる" in body
+    assert "＋ 入れる" not in body
+
+
 def test_delete_wish(auth_client, db, wish):
     from app.models import Content
 
