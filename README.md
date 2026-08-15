@@ -125,7 +125,10 @@ from wsgi import app as application
 
 ### 更新手順
 
-自動デプロイは不可。`git pull` →（必要なら `flask db upgrade`）→ Reload。
+自動デプロイは不可。`bash ~/sealnote/scripts/pythonanywhere_update.sh` → Webタブで Reload。
+
+手で行う場合、`flask` / `pip` は必ず `~/.virtualenvs/sealnote/bin/` のものを使う。
+素で打つとPythonAnywhereのシステム側が動き、`No module named 'flask_limiter'` になる。
 
 ### 運用上の必須作業
 

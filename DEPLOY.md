@@ -350,6 +350,8 @@ Webタブ上部の緑の **Reload** ボタンを押す。
 | `unable to open database file` | `DATABASE_URL` のスラッシュが3本。または `~/data` が無い |
 | ログインしても戻される | Force HTTPS が OFF、または `http://` で開いている |
 | `ModuleNotFoundError: No module named 'flask'` | Webタブの Virtualenv 欄が空、またはパス違い |
+| コンソールで `No module named 'flask_limiter'` / `No such command 'db'` | 素の `flask` を打っている（システム側が動いている）。`~/.virtualenvs/sealnote/bin/flask` とフルパスで実行する |
+| `no such column: contents.status` | `db upgrade` を実行していない |
 | 画面が真っ白／CSSが効かない | Static files の設定漏れ。設定済みなら古いキャッシュ（下記） |
 | 直したのに変わらない | **Reload を押していない**。押しても直らなければ `app/static/sw.js` の `VERSION` を上げて再Reload |
 
@@ -364,19 +366,32 @@ Service Worker が古いCSSを掴んでいる場合、スマホ側で
 自動デプロイは無い。手元でコミット＆プッシュしたあと、Bashコンソールで：
 
 ```bash
-workon sealnote
-cd ~/sealnote
-git pull
+bash ~/sealnote/scripts/pythonanywhere_update.sh
 ```
 
-必要なときだけ追加で：
-
-```bash
-pip install -r requirements.txt              # requirements.txt を変えたとき
-flask -e ~/data/.env --app wsgi db upgrade   # migrations が増えたとき
-```
+DBのバックアップ → `git pull` → 依存の更新 → マイグレーション、をまとめて行う。
 
 最後に **Webタブ → Reload**。これを忘れると反映されない。
+
+### 手で行う場合
+
+```bash
+cd ~/sealnote
+git pull
+~/.virtualenvs/sealnote/bin/pip install -r requirements.txt
+~/.virtualenvs/sealnote/bin/flask -e ~/data/.env --app wsgi db upgrade
+```
+
+⚠ **`flask` や `pip` を素で打たないこと。**
+PythonAnywhere にはシステム標準の Flask が入っているため、素で打つとそちらが動き、
+
+```
+ModuleNotFoundError: No module named 'flask_limiter'
+Error: No such command 'db'.
+```
+
+になる。`workon sealnote` で仮想環境に入っていれば素のコマンドでもよいが、
+フルパスで書くほうが確実。
 
 ---
 
