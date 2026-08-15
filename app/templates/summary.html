@@ -112,6 +112,19 @@
     {% endif %}
   </div>
 
+  {# 今週の発見（要件23-8）。0件のときは領域ごと出さない。
+     箇条書きの点は使わず、1件ずつ独立した行にする。 #}
+  {% if summary.discoveries %}
+  <div class="panel" data-reveal>
+    <h2 class="section-title">{{ DISCOVERY_HEADING }}</h2>
+    <div class="discoveries">
+      {% for d in summary.discoveries %}
+      <p class="discovery reveal-item" style="--i: {{ loop.index0 }}">{{ d.text }}</p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
   {% endif %}
 
   <div class="summary__foot">

@@ -334,3 +334,70 @@ def test_wording_has_no_exclamation_or_second_person():
             assert "!" not in d["text"]
             assert "！" not in d["text"]
             assert not d["text"].startswith("あなた")
+
+
+# --- period_start（週次で使うための基準日）-----------------------------
+
+
+def test_period_start_controls_what_counts_as_past():
+    """週次では週の初日を渡す。渡さないと同じ月の数日前が過去にならない。"""
+    now = [Rec(title="今週", creator="同じ人", logged_date=date(2026, 8, 12))]
+    earlier = [Rec(title="先週", creator="同じ人", logged_date=date(2026, 8, 3))]
+    history = earlier + now
+
+    # 週の初日を渡せば、同じ月の先週の記録が「過去」になる
+    with_week = build_discoveries(now, history, period_start=date(2026, 8, 10))
+    assert "reunion" in rule_ids(with_week)
+
+    # 渡さないと月初が基準になるので、8/3 は過去に入らない
+    without = build_discoveries(now, history)
+    assert "reunion" not in rule_ids(without)
+
+
+# --- まとめ画面への組み込み（要件23-8）---------------------------------
+
+
+def test_summary_includes_discoveries():
+    from app.summary.service import build_summary
+
+    result = build_summary([Rec(title="ひとつだけ")])
+    assert result["discoveries"][0]["rule_id"] == "only_one"
+
+
+def test_summary_with_no_records_has_no_discoveries():
+    from app.summary.service import build_summary
+
+    assert build_summary([])["discoveries"] == []
+
+
+def test_summary_page_shows_discoveries(auth_client, db):
+    """週次まとめの画面に発見が出る。"""
+    from app.models import Content
+
+    db.session.add(
+        Content(
+            category="book",
+            title="長く語った本",
+            memo="あ" * 60,
+            logged_date=date(2026, 8, 12),
+        )
+    )
+    db.session.add(
+        Content(
+            category="movie",
+            title="ほか",
+            memo="みじかい",
+            logged_date=date(2026, 8, 13),
+        )
+    )
+    db.session.commit()
+
+    body = auth_client.get("/summary/2026/8/12").get_data(as_text=True)
+    assert "今週の発見" in body
+    assert "今週いちばん長く語ったのは『長く語った本』でした" in body
+
+
+def test_summary_page_hides_discoveries_when_empty(auth_client):
+    """記録0件の週は、発見の領域ごと出さない（要件23-5）。"""
+    body = auth_client.get("/summary/2026/8/12").get_data(as_text=True)
+    assert "今週の発見" not in body

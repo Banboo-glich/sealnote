@@ -67,11 +67,15 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(wishes_bp)
 
     # --- テンプレートで使う定数を注入 ---
-    from .constants import CATEGORY_LABELS, CATEGORIES
+    from .constants import CATEGORY_LABELS, CATEGORIES, DISCOVERY_HEADING
 
     @app.context_processor
     def inject_categories():
-        return {"CATEGORY_LABELS": CATEGORY_LABELS, "CATEGORIES": CATEGORIES}
+        return {
+            "CATEGORY_LABELS": CATEGORY_LABELS,
+            "CATEGORIES": CATEGORIES,
+            "DISCOVERY_HEADING": DISCOVERY_HEADING,
+        }
 
     # --- エラーページ ---
     from flask import render_template

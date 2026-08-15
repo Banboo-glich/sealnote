@@ -30,8 +30,9 @@ def build_discoveries(
     records: Iterable[Any],
     all_records: Iterable[Any] | None = None,
     label_rule_id: str | None = None,
+    period_start: date | None = None,
 ) -> list[dict]:
-    """その月の発見を、優先順に最大2件返す（要件23-5）。
+    """その期間の発見を、優先順に最大2件返す（要件23-5）。
 
     引数:
         records: その月の status="done" の記録。
@@ -46,6 +47,10 @@ def build_discoveries(
         label_rule_id: ひとことラベル（22章）で採用されたルールID。
             "first" のときは first_category を出さない。同じ画面で同じことを
             二度言わないため（要件23-5）。未実装のうちは None を渡す。
+        period_start: 集計期間の初日。これより前が「過去」になる。
+            省略すると、records の最も古い記録が属する月の1日を使う。
+            週次で集計する場合は週の初日（月曜）を渡すこと。渡さないと
+            同じ月の数日前の記録が「過去」に入らず、reunion が出なくなる。
 
     戻り値:
         [{"rule_id": str, "text": str}, ...] 0〜2件。
@@ -56,14 +61,15 @@ def build_discoveries(
     if not records:
         return []
 
-    month_start = min(r.logged_date for r in records).replace(day=1)
+    if period_start is None:
+        period_start = min(r.logged_date for r in records).replace(day=1)
 
     # 履歴が渡されていなければ、過去について何も断定しない
     history_known = all_records is not None
     past = [
         r
         for r in (all_records or [])
-        if r.logged_date is not None and r.logged_date < month_start
+        if r.logged_date is not None and r.logged_date < period_start
     ]
 
     # 優先順に候補を組み立てる。各候補は (rule_id, text, 対象レコード集合)。

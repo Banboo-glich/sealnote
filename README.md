@@ -6,6 +6,10 @@
 まだ見ていないものは「気になるリスト」に入れておき、「見た」で記録に変換できる
 （要件21章）。変換は行をコピーせず、同じ行の `status` を `wish` → `done` に変える。
 
+まとめには「今週の発見」を最大2件出す（要件23章）。素材は「何を見たか」ではなく
+「どう記録したか」に置く。集計は `summary/discoveries.py` の純粋関数、
+文言は `constants.py` の `DISCOVERY_TEMPLATES`。
+
 - 技術構成：Python 3.12 / Flask 3.x（アプリケーションファクトリ方式）/ Jinja2 /
   Flask-SQLAlchemy / Flask-Migrate / Flask-WTF / Flask-Limiter / SQLite
 - 対象：スマホ優先（横幅375px基準）、Safari(iOS)・Chrome

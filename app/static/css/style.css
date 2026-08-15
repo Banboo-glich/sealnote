@@ -223,6 +223,17 @@ a { color: inherit; text-decoration: none; }
 .wish__title { font-weight: 500; overflow-wrap: anywhere; }
 .wish__creator { font-size: .82rem; color: var(--ink-soft); }
 .wish__actions { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* --- 今週の発見（要件23章）--- */
+/* 箇条書きの点は使わない。1件ずつ独立した行として置く。 */
+.discoveries { display: grid; gap: 12px; }
+.discovery {
+  margin: 0;
+  line-height: 1.75;
+  color: var(--ink);
+  padding-left: 12px;
+  border-left: 2px solid var(--sage);
+}
+
 .from-wish { text-align: center; color: var(--ink-soft); font-size: .9rem; margin: 0 0 20px; }
 .from-wish .num { color: var(--sage); font-size: 1.15rem; margin: 0 2px; }
 .btn--small { padding: 6px 14px; font-size: .85rem; }

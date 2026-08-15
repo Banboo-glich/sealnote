@@ -56,7 +56,14 @@ def week(year: int, month: int, day: int):
     prev_end = start - timedelta(days=1)
     prev_total = _count_between(prev_start, prev_end)
 
-    summary = build_summary(items, prev_total=prev_total)
+    summary = build_summary(
+        items,
+        prev_total=prev_total,
+        # 発見の reunion / first_category 用。週の前にある記録だけを、
+        # 必要な列だけ読む（全行をオブジェクトで持たない）。
+        all_records=_history_before(start),
+        period_start=start,
+    )
 
     next_start = start + timedelta(days=7)
     next_end = next_start + timedelta(days=6)
@@ -95,6 +102,24 @@ def _items_between(start: date, end: date) -> list:
             Content.logged_date <= end,
         )
         .order_by(Content.logged_date.desc(), Content.created_at.desc())
+        .all()
+    )
+
+
+def _history_before(start: date) -> list:
+    """その週より前の記録の履歴（要件23章の発見で使う）。
+
+    使うのは作り手・カテゴリ・記録日だけなので、その3列に絞って読む。
+    空リストは「調べた結果、過去の記録が無かった」を意味する（None とは違う）。
+    """
+    return (
+        db.session.query(
+            Content.category, Content.creator, Content.logged_date
+        )
+        .filter(
+            Content.status == STATUS_DONE,
+            Content.logged_date < start,
+        )
         .all()
     )
 

@@ -35,14 +35,17 @@ RATING_MAX = 5
 # 事実と数字だけを述べ、解釈は足さない。「あなたは〜」で始めない。感嘆符は使わない（要件23-4）。
 DISCOVERY_TEMPLATES = {
     "memo_gap": "評価は{rating}だったけれど、いちばん長く書いたのは『{title}』でした",
-    "longest_memo": "今月いちばん長く語ったのは『{title}』でした",
+    "longest_memo": "今週いちばん長く語ったのは『{title}』でした",
     "long_wait": "『{title}』は、気になるに入れてから{days}日後に見ました",
     "reunion": "{creator}を記録するのは、{year}年{month}月以来2回目です",
     "busy_day": "{month}月{day}日は、1日に{count}つ記録しました",
     "first_category": "{category}を記録したのは、これが初めてです",
-    "bookends": "今月の1まい目は『{first}』、最後は『{last}』でした",
-    "only_one": "今月の1まいは『{title}』でした",
+    "bookends": "今週の1まい目は『{first}』、最後は『{last}』でした",
+    "only_one": "今週の1まいは『{title}』でした",
 }
+
+# 見出し
+DISCOVERY_HEADING = "今週の発見"
 
 # 発見は最大2件まで（要件23-5）
 DISCOVERY_LIMIT = 2

@@ -11,13 +11,23 @@ class FakeContent:
     """Content 相当の軽量スタブ。"""
 
     def __init__(
-        self, category, rating=None, memo=None, logged_date=None, wished_at=None
+        self,
+        category,
+        rating=None,
+        memo=None,
+        logged_date=None,
+        wished_at=None,
+        title="題名",
+        creator=None,
     ):
         self.category = category
         self.rating = rating
         self.memo = memo
         self.logged_date = logged_date or date(2026, 8, 1)
         self.wished_at = wished_at
+        # 発見（要件23章）で使う
+        self.title = title
+        self.creator = creator
 
     @property
     def memo_length(self):
