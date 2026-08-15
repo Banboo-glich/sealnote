@@ -1,0 +1,4 @@
+# Windowsで編集してもLinux(PythonAnywhere)で壊れないようにする。
+# シェルスクリプトがCRLFのままだと `bash: $'\r': command not found` で動かない。
+*.sh text eol=lf
+*.py text eol=lf
