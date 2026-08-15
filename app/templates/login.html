@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}ひらく — シールノート{% endblock %}
+{% block body_class %}login-page{% endblock %}
+
+{# ログイン画面ではヘッダー（とじる等）を出さない #}
+{% block chrome %}{% endblock %}
+
+{% block content %}
+<div class="login">
+  <h1 class="login__title">シールノート</h1>
+  <p class="login__lead">あいことばを いれてね</p>
+
+  <form method="post" action="{{ url_for('auth.login') }}" class="login__form" novalidate>
+    {{ form.csrf_token }}
+    <div class="field">
+      {{ form.password.label(class="field__label") }}
+      <div class="pw">
+        {{ form.password(class="input pw__input", autocomplete="current-password", autofocus=true) }}
+        {# JSが無い環境では出さない（押しても何も起きないボタンを見せないため） #}
+        <button type="button" class="pw__toggle" data-pw-toggle
+                aria-label="あいことばを表示する" aria-pressed="false">
+          <svg class="pw__eye" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/>
+            <circle cx="12" cy="12" r="3"/>
+            <path class="pw__slash" d="M4 20 20 4"/>
+          </svg>
+        </button>
+      </div>
+      {% for e in form.password.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+    {{ form.submit(class="btn btn--primary btn--block") }}
+  </form>
+</div>
+{% endblock %}

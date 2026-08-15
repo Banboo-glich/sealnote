@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}見つかりません — シールノート{% endblock %}
+{% block content %}
+<div class="notice">
+  <h1 class="notice__title">ページが 見つかりません</h1>
+  <p class="notice__body">おさがしのシールは ないみたいです。</p>
+  <a class="btn btn--ghost" href="{{ url_for('main.home') }}">ホームへ</a>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_icons.html" import category_icon, stars %}
+{% block title %}{{ year }}年{{ month }}月の記録 — シールノート{% endblock %}
+
+{% block content %}
+<section class="list-page">
+  <div class="list-head">
+    <h1 class="page-title">{{ year }}年{{ month }}月</h1>
+    <a class="btn btn--primary" href="{{ url_for('logs.new') }}">＋ 貼る</a>
+  </div>
+
+  {# カテゴリ絞り込み #}
+  <nav class="filter">
+    <a class="chip {% if not category %}chip--on{% endif %}"
+       href="{{ url_for('logs.index', year=year, month=month) }}">すべて</a>
+    {% for key, label in CATEGORIES %}
+    <a class="chip cat--{{ key }} {% if category == key %}chip--on{% endif %}"
+       href="{{ url_for('logs.index', year=year, month=month, category=key) }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if items %}
+  <ul class="sticker-list">
+    {% for item in items %}
+    <li class="sticker cat--{{ item.category }}">
+      <a class="sticker__link" href="{{ url_for('logs.edit', log_id=item.id) }}">
+        <span class="sticker__icon">{{ category_icon(item.category) }}</span>
+        <span class="sticker__body">
+          <span class="sticker__title">{{ item.title }}</span>
+          {% if item.creator %}<span class="sticker__creator">{{ item.creator }}</span>{% endif %}
+          {% if item.memo %}<span class="sticker__memo">{{ item.memo }}</span>{% endif %}
+        </span>
+        <span class="sticker__meta">
+          {% if item.rating %}{{ stars(item.rating) }}{% endif %}
+          <span class="sticker__date">{{ item.logged_date.day }}日</span>
+        </span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty">
+    <p class="empty__lead">この月には まだ何もありません</p>
+    <p class="empty__sub">1まい目を貼ってみましょう</p>
+    <a class="btn btn--primary" href="{{ url_for('logs.new') }}">シールを貼る</a>
+  </div>
+  {% endif %}
+
+  <div class="list-foot">
+    <a href="{{ url_for('summary.current') }}" class="btn btn--ghost">今週のまとめを見る</a>
+  </div>
+</section>
+{% endblock %}

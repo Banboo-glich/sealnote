@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "_icons.html" import category_icon %}
+{% block title %}{{ 'シールを貼りなおす' if mode == 'edit' else 'シールを貼る' }} — シールノート{% endblock %}
+
+{% block content %}
+<section class="form-page">
+  <h1 class="page-title">{{ 'シールを貼りなおす' if mode == 'edit' else 'シールを貼る' }}</h1>
+
+  <form method="post"
+        action="{{ url_for('logs.update', log_id=content.id) if mode == 'edit' else url_for('logs.create') }}"
+        class="cform" novalidate>
+    {{ form.csrf_token }}
+
+    {# カテゴリ：色とアイコンで選ぶ #}
+    <fieldset class="field">
+      <legend class="field__label">カテゴリ<span class="req">必須</span></legend>
+      <div class="cat-grid">
+        {% for key, label in CATEGORIES %}
+        <label class="cat-choice cat--{{ key }}">
+          <input type="radio" name="category" value="{{ key }}"
+                 {% if form.category.data == key %}checked{% endif %}>
+          <span class="cat-choice__icon">{{ category_icon(key) }}</span>
+          <span class="cat-choice__label">{{ label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% for e in form.category.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </fieldset>
+
+    <div class="field">
+      {{ form.title.label(class="field__label") }}<span class="req">必須</span>
+      {{ form.title(class="input", maxlength="200", placeholder="作品の名前") }}
+      {% for e in form.title.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="field">
+      {{ form.creator.label(class="field__label") }}
+      {{ form.creator(class="input", maxlength="120", placeholder="著者・監督・アーティストなど") }}
+      {% for e in form.creator.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="field">
+      <span class="field__label">評価</span>
+      <span class="field__hint">あとから付けてもOK</span>
+      <div class="rating-input">
+        {% for value, label in form.rating.choices %}
+        <label class="rating-choice {% if value == '' %}rating-choice--none{% endif %}">
+          <input type="radio" name="rating" value="{{ value }}"
+                 {% if (form.rating.data or '') == value %}checked{% endif %}>
+          <span>{{ label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% for e in form.rating.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="field">
+      {{ form.memo.label(class="field__label") }}
+      {{ form.memo(class="input textarea", maxlength="500", rows="4", placeholder="心が動いたこと、ひとこと") }}
+      {% for e in form.memo.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="field">
+      {{ form.logged_date.label(class="field__label") }}<span class="req">必須</span>
+      {{ form.logged_date(class="input", type="date") }}
+      {% for e in form.logged_date.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="form-actions">
+      {{ form.submit(class="btn btn--primary btn--block") }}
+      <a class="btn btn--ghost btn--block" href="{{ url_for('logs.index') }}">やめる</a>
+    </div>
+  </form>
+
+  {% if mode == 'edit' %}
+  <form method="post" action="{{ url_for('logs.delete', log_id=content.id) }}"
+        class="delete-form" data-confirm="このシールをはがしますか？">
+    {{ form.csrf_token }}
+    <button type="submit" class="linkbtn linkbtn--danger">このシールをはがす</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}すこし お待ちを — シールノート{% endblock %}
+{% block chrome %}{% endblock %}
+{% block content %}
+<div class="notice">
+  <h1 class="notice__title">すこし お待ちください</h1>
+  <p class="notice__body">あいことばの入力が つづきました。<br>しばらくしてから もう一度おためしください。</p>
+  <a class="btn btn--ghost" href="{{ url_for('auth.login') }}">もどる</a>
+</div>
+{% endblock %}

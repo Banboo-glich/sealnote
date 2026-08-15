@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% from "_icons.html" import category_icon, stars %}
+{% block title %}{{ start.month }}月{{ start.day }}日〜{{ end.month }}月{{ end.day }}日のまとめ — シールノート{% endblock %}
+{% block body_class %}summary-page{% endblock %}
+
+{% block content %}
+<section class="summary">
+  {# 週移動。0件の週へのリンクは無効表示（要件6章） #}
+  <nav class="period-nav">
+    {% if prev_has %}
+      <a class="period-nav__btn" href="{{ url_for('summary.week', year=prev_start.year, month=prev_start.month, day=prev_start.day) }}">‹ 先週</a>
+    {% else %}
+      <span class="period-nav__btn is-disabled" aria-disabled="true">‹ 先週</span>
+    {% endif %}
+    <h1 class="period-nav__title">
+      <span class="num">{{ start.month }}</span>/<span class="num">{{ start.day }}</span>
+      〜
+      <span class="num">{{ end.month }}</span>/<span class="num">{{ end.day }}</span>
+    </h1>
+    {% if next_has %}
+      <a class="period-nav__btn" href="{{ url_for('summary.week', year=next_start.year, month=next_start.month, day=next_start.day) }}">翌週 ›</a>
+    {% else %}
+      <span class="period-nav__btn is-disabled" aria-disabled="true">翌週 ›</span>
+    {% endif %}
+  </nav>
+
+  {% if summary.total_count == 0 %}
+  <div class="empty">
+    <p class="empty__lead">この週には まだ何もありません</p>
+    <p class="empty__sub">1まい目を貼ってみましょう</p>
+    <a class="btn btn--primary" href="{{ url_for('logs.new') }}">シールを貼る</a>
+  </div>
+  {% else %}
+
+  {# 1. 総数と日数 + 先週比 #}
+  <div class="stat-cards" data-reveal>
+    <div class="stat-card">
+      <span class="stat-card__num num">{{ summary.total_count }}</span>
+      <span class="stat-card__label">まい</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__num num">{{ summary.active_days }}</span>
+      <span class="stat-card__label">日ぶん</span>
+    </div>
+    {% if summary.diff is not none %}
+    <div class="stat-card stat-card--diff">
+      {% if summary.diff > 0 %}
+        <span class="stat-card__num num">＋{{ summary.diff }}</span>
+      {% elif summary.diff < 0 %}
+        <span class="stat-card__num num">{{ summary.diff }}</span>
+      {% else %}
+        <span class="stat-card__num num">±0</span>
+      {% endif %}
+      <span class="stat-card__label">先週と</span>
+    </div>
+    {% endif %}
+  </div>
+
+  {# 3. 最も多かったカテゴリ #}
+  {% if summary.top_category %}
+  <p class="top-cat" data-reveal>
+    いちばん多かったのは
+    <span class="top-cat__name cat--{{ summary.top_category }}">
+      {{ category_icon(summary.top_category) }}{{ CATEGORY_LABELS[summary.top_category] }}
+    </span>
+  </p>
+  {% endif %}
+
+  {# 2. カテゴリ別件数（降順）— シールが1枚ずつ現れる #}
+  <div class="panel" data-reveal>
+    <h2 class="section-title">カテゴリ別</h2>
+    <ul class="cat-bars">
+      {% for key, count in summary.by_category %}
+      <li class="cat-bar cat--{{ key }} reveal-item" style="--i: {{ loop.index0 }}">
+        <span class="cat-bar__icon">{{ category_icon(key) }}</span>
+        <span class="cat-bar__name">{{ CATEGORY_LABELS[key] }}</span>
+        <span class="cat-bar__track">
+          <span class="cat-bar__fill" style="--w: {{ (count / summary.total_count * 100)|round(0, 'floor') }}%"></span>
+        </span>
+        <span class="cat-bar__count num">{{ count }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {# 4. お気に入り 上位3件（要件5章） #}
+  <div class="panel" data-reveal>
+    <h2 class="section-title">お気に入り</h2>
+    {% if summary.favorites %}
+    <ol class="fav-list">
+      {% for item in summary.favorites %}
+      <li class="fav-item cat--{{ item.category }} reveal-item" style="--i: {{ loop.index0 }}">
+        <span class="fav-item__rank num">{{ loop.index }}</span>
+        <span class="fav-item__icon">{{ category_icon(item.category) }}</span>
+        <span class="fav-item__body">
+          <a class="fav-item__title" href="{{ url_for('logs.edit', log_id=item.id) }}">{{ item.title }}</a>
+          {% if item.creator %}<span class="fav-item__creator">{{ item.creator }}</span>{% endif %}
+        </span>
+        {{ stars(item.rating) }}
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="fav-empty">評価をつけると、お気に入りがここに出ます</p>
+    {% endif %}
+  </div>
+
+  {% endif %}
+
+  <div class="summary__foot">
+    <a class="btn btn--ghost" href="{{ url_for('logs.index', year=start.year, month=start.month) }}">{{ start.month }}月の記録を見る</a>
+  </div>
+</section>
+{% endblock %}
