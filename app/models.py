@@ -5,6 +5,7 @@
 from datetime import datetime, date
 
 from . import db
+from .constants import CATEGORY_LABELS, RATING_MAX
 
 
 class Content(db.Model):
@@ -31,6 +32,24 @@ class Content(db.Model):
     def memo_length(self) -> int:
         """お気に入り判定で使う、メモの文字数。"""
         return len(self.memo) if self.memo else 0
+
+    @property
+    def share_text(self) -> str:
+        """LINEなどに送る共有用テキスト。
+
+        アプリはあいことばで守られているため、URLを送っても相手は開けない。
+        そこでカードの中身そのものを文章にして送る。
+        絵文字は使わない（要件9章）。
+        """
+        lines = [f"【{CATEGORY_LABELS.get(self.category, 'そのほか')}】{self.title}"]
+        if self.creator:
+            lines.append(self.creator)
+        if self.rating:
+            lines.append("★" * self.rating + "☆" * (RATING_MAX - self.rating))
+        if self.memo:
+            lines.append("")
+            lines.append(self.memo)
+        return "\n".join(lines)
 
     def __repr__(self) -> str:
         return f"<Content {self.id} {self.category} {self.title!r}>"

@@ -82,6 +82,59 @@ def test_delete_removes(auth_client, db):
     assert Content.query.count() == 0
 
 
+def test_share_text_contains_card_contents(db):
+    """共有テキストにカードの中身が入る（F-07）。"""
+    from app.models import Content
+
+    c = Content(
+        category="book",
+        title="銀河鉄道の夜",
+        creator="宮沢賢治",
+        rating=4,
+        memo="夜汽車の場面がよかった",
+        logged_date=date(2026, 8, 10),
+    )
+    assert c.share_text == (
+        "【本】銀河鉄道の夜\n"
+        "宮沢賢治\n"
+        "★★★★☆\n"
+        "\n"
+        "夜汽車の場面がよかった"
+    )
+
+
+def test_share_text_omits_empty_fields(db):
+    """作り手・評価・メモが未入力なら、その行は出さない。"""
+    from app.models import Content
+
+    c = Content(
+        category="other", title="タイトルだけ", logged_date=date(2026, 8, 10)
+    )
+    assert c.share_text == "【そのほか】タイトルだけ"
+
+
+def test_edit_page_has_line_share_link(auth_client, db):
+    """編集画面にLINE共有リンクがあり、本文がURLエンコードされている。"""
+    from app.models import Content
+
+    auth_client.post(
+        "/logs",
+        data={
+            "category": "movie",
+            "title": "共有する映画",
+            "rating": "5",
+            "logged_date": "2026-08-10",
+        },
+    )
+    c = Content.query.first()
+    body = auth_client.get(f"/logs/{c.id}/edit").get_data(as_text=True)
+
+    assert "https://line.me/R/share?text=" in body
+    # 改行がそのまま属性に出ず、%0A に変換されていること
+    assert "%0A" in body
+    assert "LINEで送る" in body
+
+
 def test_summary_page_renders(auth_client):
     """指定週のまとめが表示される（0件でもエラーにならない）。"""
     res = auth_client.get("/summary/2026/8/10")  # 月曜

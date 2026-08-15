@@ -201,6 +201,14 @@ a { color: inherit; text-decoration: none; }
 .form-actions { display: grid; gap: 10px; margin-top: 8px; }
 .delete-form { margin-top: 24px; text-align: center; }
 
+/* --- 共有 --- */
+.card-share { margin-top: 28px; }
+.card-share__note { font-size: .78rem; color: var(--ink-soft); text-align: center; margin: 8px 0 0; }
+/* LINEのブランド色。他のボタンより主張しないよう、塗りではなく線で使う。 */
+.btn--line { background: transparent; color: #06985f; border-color: #06c755; gap: 8px; }
+.btn--line:hover { background: #06c755; color: #fff; border-color: #06c755; }
+.btn__icon { flex: none; }
+
 /* --- ホーム --- */
 .home__hero { text-align: center; padding: 12px 0 24px; }
 .home__greeting { color: var(--ink-soft); font-size: .95rem; margin: 0 0 12px; }

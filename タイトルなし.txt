@@ -1,0 +1,32 @@
+
+      ↓ 中身をここにも出しておきます（コピーして貼ってもよい）
+------------------------------------------------------------------------
+import os
+import sys
+from dotenv import load_dotenv
+PROJECT = "/home/banbooLk8y3urB/sealnote"
+# ① 先に環境変数を読み込む。
+#    設定クラスは import された瞬間に os.environ を読むので、この順番が重要。
+#    ②を先に書くと「必須の環境変数が未設定です」で起動に失敗する。
+load_dotenv("/home/banbooLk8y3urB/data/.env")
+os.environ.setdefault("FLASK_ENV", "production")
+# ② そのあとでアプリを読み込む
+if PROJECT not in sys.path:
+    sys.path.insert(0, PROJECT)
+from wsgi import app as application  # noqa: E402
+------------------------------------------------------------------------
+【4】 Static files セクションに1行追加:
+      URL:       /static/
+      Directory: /home/banbooLk8y3urB/sealnote/app/static
+【5】 Security セクション → Force HTTPS を Enabled に
+      ※必須。OFF だとログインしても弾かれ続けます
+【6】 上部の緑の Reload ボタンを押す
+      → https://banbooLk8y3urB.pythonanywhere.com
+========================================================================
+ あいことばを変えたくなったら:
+   rm /home/banbooLk8y3urB/data/.env && bash /home/banbooLk8y3urB/sealnote/scripts/pythonanywhere_setup.sh
+ （DBは消えません。記録は残ります）
+========================================================================
+02:18 ~ $ 
+
+ython 3.12.8
