@@ -14,22 +14,27 @@
 
 ## 0. 手元のPCでの準備（GitHubに上げる）
 
-### ⚠ 先に読む：このフォルダはまだGitリポジトリではない
+> このリポジトリを clone して使う場合、手順0は済んでいる。手順1へ進んでよい。
 
-`C:\Users\youxi\Desktop\sealnote` は、それ自体はGit管理されていない。
-そして**親フォルダの `C:\Users\youxi` が、別プロジェクト（RaspberryPi_Timelapse）の
-リポジトリになっている。**
+### ⚠ 先に読む：Gitリポジトリの範囲を確認する
 
-このまま `git add .` をすると、デスクトップや書類フォルダを含む**ホームフォルダ全体**が
-関係ないリポジトリにコミットされてしまう。必ず `sealnote` フォルダの中で `git init` して、
-独立したリポジトリにしてから作業する。
+`git init` する前に、そのフォルダが**別のリポジトリの中に入っていないか**を確かめる。
+
+```bash
+git rev-parse --show-toplevel
+```
+
+ホームフォルダなど、意図しない場所が表示されたら要注意。そのまま `git add .` すると
+**書類・ダウンロード・`.ssh` を含むフォルダ全体**が、関係ないリポジトリに
+コミットされてしまう。プロジェクトのフォルダの中で `git init` して、
+独立したリポジトリにしてから作業すること。
 
 ### 0-1. リポジトリを作る
 
 Git Bash か PowerShell で、**sealnote フォルダの中に移動してから**：
 
 ```bash
-cd ~/Desktop/sealnote
+cd <プロジェクトのフォルダ>
 git init
 git add .
 git status          # ← ここで .env と data/ が出ていないことを必ず確認する
@@ -92,16 +97,16 @@ pythonanywhere.com → **Pricing & signup** → **Create a Beginner account**（
 
 上部メニュー **Consoles** → **Bash** をクリックして、コンソールを開く。
 
-Private リポジトリの場合（トークンをURLに埋め込む）：
-
-```bash
-git clone https://<トークン>@github.com/<GitHubユーザー名>/sealnote.git
-```
-
-Public リポジトリの場合：
+Public リポジトリの場合（認証不要）：
 
 ```bash
 git clone https://github.com/<GitHubユーザー名>/sealnote.git
+```
+
+Private リポジトリの場合（0-3 のトークンをURLに埋め込む）：
+
+```bash
+git clone https://<トークン>@github.com/<GitHubユーザー名>/sealnote.git
 ```
 
 確認：
@@ -111,6 +116,22 @@ ls ~/sealnote
 ```
 
 `app  data  migrations  requirements.txt  wsgi.py ...` のように出ればよい。
+
+---
+
+## 3〜5をまとめて実行する（推奨）
+
+手順3・4・5（仮想環境／`.env`／DB作成）は、スクリプト1本で済む：
+
+```bash
+bash ~/sealnote/scripts/pythonanywhere_setup.sh
+```
+
+途中であいことばを2回聞かれる（画面には表示されない）。それ以外は自動。
+終わると、手順6でWebタブに貼る値がそのまま印字される。
+
+何度実行してもよい（すでにあるものは作り直さない）。
+うまく動かないときや、中で何をしているか確かめたいときは、以下の3〜5を手でたどる。
 
 ---
 
