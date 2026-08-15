@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_icons.html" import category_icon %}
+{% block title %}気になるを入れる — シールノート{% endblock %}
+
+{# 入力欄はカテゴリ・タイトル・作り手の3つだけ（要件21-7）。
+   評価・メモ・日付は、まだ見ていないものに入力する項目ではない。 #}
+{% block content %}
+<section class="form-page">
+  <h1 class="page-title">気になる</h1>
+  <p class="form-lead">まだ見ていないものを入れておけます</p>
+
+  <form method="post" action="{{ url_for('wishes.create') }}" class="cform" novalidate>
+    {{ form.csrf_token }}
+
+    <fieldset class="field">
+      <legend class="field__label">カテゴリ<span class="req">必須</span></legend>
+      <div class="cat-grid">
+        {% for key, label in CATEGORIES %}
+        <label class="cat-choice cat--{{ key }}">
+          <input type="radio" name="category" value="{{ key }}"
+                 {% if form.category.data == key %}checked{% endif %}>
+          <span class="cat-choice__icon">{{ category_icon(key) }}</span>
+          <span class="cat-choice__label">{{ label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% for e in form.category.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </fieldset>
+
+    <div class="field">
+      {{ form.title.label(class="field__label") }}<span class="req">必須</span>
+      {{ form.title(class="input", maxlength="200", placeholder="作品の名前") }}
+      {% for e in form.title.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="field">
+      {{ form.creator.label(class="field__label") }}
+      {{ form.creator(class="input", maxlength="120", placeholder="著者・監督・アーティストなど") }}
+      {% for e in form.creator.errors %}<p class="field__error">{{ e }}</p>{% endfor %}
+    </div>
+
+    <div class="form-actions">
+      {{ form.submit(class="btn btn--primary btn--block") }}
+      <a class="btn btn--ghost btn--block" href="{{ url_for('wishes.index') }}">やめる</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

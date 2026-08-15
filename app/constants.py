@@ -29,3 +29,9 @@ MEMO_MAX = 500
 # 評価の範囲
 RATING_MIN = 1
 RATING_MAX = 5
+
+# --- 状態（要件21章：気になるリスト）---
+# "done" = 見たもの（シール1枚）。"wish" = まだ見ていないもの。
+STATUS_DONE = "done"
+STATUS_WISH = "wish"
+STATUS_KEYS = [STATUS_DONE, STATUS_WISH]

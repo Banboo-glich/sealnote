@@ -13,6 +13,7 @@ from flask import Blueprint, render_template, redirect, url_for, abort
 from .. import db
 from ..auth import login_required
 from ..models import Content
+from ..constants import STATUS_DONE
 from .service import build_summary
 
 bp = Blueprint("summary", __name__)
@@ -86,8 +87,10 @@ def _week_url(day: date) -> str:
 
 
 def _items_between(start: date, end: date) -> list:
+    # 気になる項目は集計に一切含めない（要件21-5・21-9）
     return (
         Content.query.filter(
+            Content.status == STATUS_DONE,
             Content.logged_date >= start,
             Content.logged_date <= end,
         )
@@ -100,6 +103,7 @@ def _count_between(start: date, end: date) -> int:
     return (
         db.session.query(db.func.count(Content.id))
         .filter(
+            Content.status == STATUS_DONE,
             Content.logged_date >= start,
             Content.logged_date <= end,
         )

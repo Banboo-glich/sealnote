@@ -10,11 +10,14 @@ from app.summary.service import build_summary
 class FakeContent:
     """Content 相当の軽量スタブ。"""
 
-    def __init__(self, category, rating=None, memo=None, logged_date=None):
+    def __init__(
+        self, category, rating=None, memo=None, logged_date=None, wished_at=None
+    ):
         self.category = category
         self.rating = rating
         self.memo = memo
         self.logged_date = logged_date or date(2026, 8, 1)
+        self.wished_at = wished_at
 
     @property
     def memo_length(self):
@@ -29,6 +32,19 @@ def test_empty_does_not_raise():
     assert result["by_category"] == []
     assert result["top_category"] is None
     assert result["favorites"] == []
+    assert result["from_wish_count"] == 0
+
+
+def test_from_wish_count():
+    """気になるリスト経由の件数だけを数える（要件21-9）。"""
+    from datetime import datetime
+
+    items = [
+        FakeContent("book", wished_at=datetime(2026, 8, 1)),
+        FakeContent("movie"),  # 直接記録
+        FakeContent("music", wished_at=datetime(2026, 8, 3)),
+    ]
+    assert build_summary(items)["from_wish_count"] == 2
 
 
 def test_counts_and_active_days():

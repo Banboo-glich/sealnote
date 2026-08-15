@@ -6,9 +6,11 @@
 <section class="form-page">
   <h1 class="page-title">{{ 'シールを貼りなおす' if mode == 'edit' else 'シールを貼る' }}</h1>
 
-  <form method="post"
-        action="{{ url_for('logs.update', log_id=content.id) if mode == 'edit' else url_for('logs.create') }}"
-        class="cform" novalidate>
+  {% if mode == 'convert' %}
+  <p class="form-lead">気になるリストから。見たところを足してください</p>
+  {% endif %}
+
+  <form method="post" action="{{ action }}" class="cform" novalidate>
     {{ form.csrf_token }}
 
     {# カテゴリ：色とアイコンで選ぶ #}

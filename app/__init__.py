@@ -44,7 +44,9 @@ def create_app(config_name: str | None = None) -> Flask:
 
     # --- 拡張の初期化 ---
     db.init_app(app)
-    migrate.init_app(app, db)
+    # render_as_batch: SQLite は ALTER COLUMN を直接扱えないため、
+    # テーブル作り直し方式（batch）でマイグレーションを生成させる。
+    migrate.init_app(app, db, render_as_batch=True)
     csrf.init_app(app)
     limiter.init_app(app)
 
@@ -56,11 +58,13 @@ def create_app(config_name: str | None = None) -> Flask:
     from .main import bp as main_bp
     from .logs.routes import bp as logs_bp
     from .summary.routes import bp as summary_bp
+    from .wishes.routes import bp as wishes_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(logs_bp)
     app.register_blueprint(summary_bp)
+    app.register_blueprint(wishes_bp)
 
     # --- テンプレートで使う定数を注入 ---
     from .constants import CATEGORY_LABELS, CATEGORIES

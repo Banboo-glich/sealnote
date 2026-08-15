@@ -24,6 +24,10 @@
       <a class="btn btn--ghost" href="{{ url_for('logs.index') }}">今月の記録</a>
       <a class="btn btn--ghost" href="{{ url_for('summary.current') }}">今週のまとめ</a>
     </div>
+    {# 控えめなテキストリンクにする。ボタンで目立たせない（要件21-10） #}
+    <p class="home__quiet-link">
+      <a href="{{ url_for('wishes.index') }}">気になるリスト</a>
+    </p>
   </div>
 
   {% if recent %}

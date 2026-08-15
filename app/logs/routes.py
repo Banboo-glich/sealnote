@@ -15,7 +15,8 @@ from .. import db
 from ..auth import login_required
 from ..models import Content
 from ..forms import ContentForm
-from ..constants import CATEGORY_KEYS
+from ..constants import CATEGORY_KEYS, STATUS_DONE
+from ..utils import clean_text
 
 bp = Blueprint("logs", __name__)
 
@@ -31,7 +32,9 @@ def index():
     if category not in CATEGORY_KEYS:
         category = None
 
+    # 気になる項目は一覧に出さない（要件21-5）
     query = Content.query.filter(
+        Content.status == STATUS_DONE,
         db.extract("year", Content.logged_date) == year,
         db.extract("month", Content.logged_date) == month,
     )
@@ -58,7 +61,9 @@ def new():
     form = ContentForm()
     if not form.logged_date.data:
         form.logged_date.data = date.today()
-    return render_template("log_form.html", form=form, mode="new")
+    return render_template(
+        "log_form.html", form=form, mode="new", action=url_for("logs.create")
+    )
 
 
 @bp.route("/logs", methods=["POST"])
@@ -70,9 +75,9 @@ def create():
         content = Content(
             category=form.category.data,
             title=form.title.data.strip(),
-            creator=_clean(form.creator.data),
+            creator=clean_text(form.creator.data),
             rating=form.rating_value(),
-            memo=_clean(form.memo.data),
+            memo=clean_text(form.memo.data),
             logged_date=form.logged_date.data,
         )
         db.session.add(content)
@@ -85,32 +90,40 @@ def create():
                 month=content.logged_date.month,
             )
         )
-    return render_template("log_form.html", form=form, mode="new")
+    return render_template(
+        "log_form.html", form=form, mode="new", action=url_for("logs.create")
+    )
 
 
 @bp.route("/logs/<int:log_id>/edit")
 @login_required
 def edit(log_id: int):
     """編集フォーム（F-03）。"""
-    content = db.session.get(Content, log_id) or abort(404)
+    content = _get_done_or_404(log_id)
     form = ContentForm(obj=content)
     # rating は文字列選択なので明示的に詰め直す
     form.rating.data = "" if content.rating is None else str(content.rating)
-    return render_template("log_form.html", form=form, mode="edit", content=content)
+    return render_template(
+        "log_form.html",
+        form=form,
+        mode="edit",
+        content=content,
+        action=url_for("logs.update", log_id=content.id),
+    )
 
 
 @bp.route("/logs/<int:log_id>", methods=["POST"])
 @login_required
 def update(log_id: int):
     """更新（F-03）。"""
-    content = db.session.get(Content, log_id) or abort(404)
+    content = _get_done_or_404(log_id)
     form = ContentForm()
     if form.validate_on_submit():
         content.category = form.category.data
         content.title = form.title.data.strip()
-        content.creator = _clean(form.creator.data)
+        content.creator = clean_text(form.creator.data)
         content.rating = form.rating_value()
-        content.memo = _clean(form.memo.data)
+        content.memo = clean_text(form.memo.data)
         content.logged_date = form.logged_date.data
         db.session.commit()
         flash("シールを貼りなおしました", "success")
@@ -121,14 +134,20 @@ def update(log_id: int):
                 month=content.logged_date.month,
             )
         )
-    return render_template("log_form.html", form=form, mode="edit", content=content)
+    return render_template(
+        "log_form.html",
+        form=form,
+        mode="edit",
+        content=content,
+        action=url_for("logs.update", log_id=content.id),
+    )
 
 
 @bp.route("/logs/<int:log_id>/delete", methods=["POST"])
 @login_required
 def delete(log_id: int):
     """削除（F-04）。確認は画面側のダイアログで行う。"""
-    content = db.session.get(Content, log_id) or abort(404)
+    content = _get_done_or_404(log_id)
     year, month = content.logged_date.year, content.logged_date.month
     db.session.delete(content)
     db.session.commit()
@@ -137,6 +156,18 @@ def delete(log_id: int):
 
 
 # --- ヘルパ ---
+def _get_done_or_404(log_id: int) -> Content:
+    """記録（done）だけを取り出す。
+
+    気になる項目（wish）はまだシールではないので、記録用の画面では扱わない。
+    /logs/<id>/edit などに wish のIDを渡しても404にする（要件21-5）。
+    """
+    content = db.session.get(Content, log_id)
+    if content is None or content.status != STATUS_DONE:
+        abort(404)
+    return content
+
+
 def _int_arg(name: str, default: int) -> int:
     try:
         return int(request.args.get(name, default))
@@ -144,9 +175,3 @@ def _int_arg(name: str, default: int) -> int:
         return default
 
 
-def _clean(value: str | None) -> str | None:
-    """空文字は None に。前後の空白を除去。"""
-    if value is None:
-        return None
-    value = value.strip()
-    return value or None

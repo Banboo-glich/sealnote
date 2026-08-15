@@ -3,6 +3,9 @@
 日々ふれたコンテンツ（本・映画・舞台・音楽など）を1件ずつ「シール」として記録し、
 週ごとに振り返るWebアプリ。利用者1人・単一パスワードで守るPWA。
 
+まだ見ていないものは「気になるリスト」に入れておき、「見た」で記録に変換できる
+（要件21章）。変換は行をコピーせず、同じ行の `status` を `wish` → `done` に変える。
+
 - 技術構成：Python 3.12 / Flask 3.x（アプリケーションファクトリ方式）/ Jinja2 /
   Flask-SQLAlchemy / Flask-Migrate / Flask-WTF / Flask-Limiter / SQLite
 - 対象：スマホ優先（横幅375px基準）、Safari(iOS)・Chrome

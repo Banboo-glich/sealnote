@@ -201,6 +201,32 @@ a { color: inherit; text-decoration: none; }
 .form-actions { display: grid; gap: 10px; margin-top: 8px; }
 .delete-form { margin-top: 24px; text-align: center; }
 
+.form-lead { color: var(--ink-soft); font-size: .9rem; margin: -8px 0 20px; }
+
+/* --- 気になるリスト（要件21章）--- */
+/* 件数バッジ・経過日数は出さない。並びは追加が新しい順のみ。 */
+.home__quiet-link { text-align: center; margin: 18px 0 0; }
+.home__quiet-link a { color: var(--ink-soft); font-size: .88rem; }
+.home__quiet-link a:hover { color: var(--rose); }
+
+.wish-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.wish {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 3px solid currentColor;
+  border-radius: var(--radius-card);
+}
+.wish__icon { flex: none; display: flex; }
+.wish__body { flex: 1; min-width: 0; display: grid; gap: 2px; color: var(--ink); }
+.wish__title { font-weight: 500; overflow-wrap: anywhere; }
+.wish__creator { font-size: .82rem; color: var(--ink-soft); }
+.wish__actions { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.from-wish { text-align: center; color: var(--ink-soft); font-size: .9rem; margin: 0 0 20px; }
+.from-wish .num { color: var(--sage); font-size: 1.15rem; margin: 0 2px; }
+.btn--small { padding: 6px 14px; font-size: .85rem; }
+
 /* --- 共有 --- */
 .card-share { margin-top: 28px; }
 .card-share__note { font-size: .78rem; color: var(--ink-soft); text-align: center; margin: 8px 0 0; }

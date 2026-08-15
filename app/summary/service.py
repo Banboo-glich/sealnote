@@ -17,7 +17,8 @@ def build_summary(items: Iterable[Any], prev_total: int | None = None) -> dict:
     引数:
         items: Content 相当のオブジェクト列。各要素は
             .category(str), .rating(int|None), .memo(str|None),
-            .logged_date(date), .memo_length(int) を持つ。
+            .logged_date(date), .memo_length(int), .wished_at(datetime|None)
+            を持つ。呼び出し側で status="done" に絞ってあることを前提とする。
         prev_total: 前の期間（前週）の総記録数。差分の計算用。無ければ None。
 
     戻り値の辞書キー:
@@ -28,6 +29,7 @@ def build_summary(items: Iterable[Any], prev_total: int | None = None) -> dict:
         favorites: お気に入り上位3件（Contentオブジェクトのリスト）
         prev_total: 前の期間の総記録数（引数のまま。None可）
         diff: total_count - prev_total（prev_total が None なら None）
+        from_wish_count: そのうち気になるリスト経由で見た件数（要件21-9）
     """
     items = list(items)
 
@@ -52,6 +54,12 @@ def build_summary(items: Iterable[Any], prev_total: int | None = None) -> dict:
 
     diff = None if prev_total is None else total_count - prev_total
 
+    # 気になるリスト経由で見た件数（要件21-9）。
+    # 残っている件数は数えない。未消化を数字で見せると振り返りが未達成の確認になるため。
+    from_wish_count = sum(
+        1 for item in items if getattr(item, "wished_at", None) is not None
+    )
+
     return {
         "total_count": total_count,
         "active_days": active_days,
@@ -60,6 +68,7 @@ def build_summary(items: Iterable[Any], prev_total: int | None = None) -> dict:
         "favorites": favorites,
         "prev_total": prev_total,
         "diff": diff,
+        "from_wish_count": from_wish_count,
     }
 
 

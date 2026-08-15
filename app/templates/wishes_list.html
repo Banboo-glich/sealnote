@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_icons.html" import category_icon %}
+{% block title %}気になる — シールノート{% endblock %}
+
+{#
+  要件21-10の禁止事項に従う画面。
+  件数バッジ・経過日数・古い順・期限は出さない。並びは追加が新しい順のみ。
+#}
+{% block content %}
+<section class="list-page">
+  <div class="list-head">
+    <h1 class="page-title">気になる</h1>
+    <a class="btn btn--primary" href="{{ url_for('wishes.new') }}">＋ 入れる</a>
+  </div>
+
+  {% if items %}
+  <ul class="wish-list">
+    {% for item in items %}
+    <li class="wish cat--{{ item.category }}">
+      <span class="wish__icon">{{ category_icon(item.category) }}</span>
+      <span class="wish__body">
+        <span class="wish__title">{{ item.title }}</span>
+        {% if item.creator %}<span class="wish__creator">{{ item.creator }}</span>{% endif %}
+      </span>
+      <span class="wish__actions">
+        <a class="btn btn--ghost btn--small"
+           href="{{ url_for('wishes.log', wish_id=item.id) }}">見た</a>
+        <form method="post" action="{{ url_for('wishes.delete', wish_id=item.id) }}"
+              data-confirm="「{{ item.title }}」を消しますか？">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="linkbtn linkbtn--danger">消す</button>
+        </form>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty">
+    <p class="empty__lead">気になったものを入れておけます</p>
+    <p class="empty__sub">読みたい本、見たい映画。あとで思い出せます</p>
+    <a class="btn btn--primary" href="{{ url_for('wishes.new') }}">入れてみる</a>
+  </div>
+  {% endif %}
+
+  <div class="list-foot">
+    <a href="{{ url_for('main.home') }}" class="btn btn--ghost">ホームへ</a>
+  </div>
+</section>
+{% endblock %}

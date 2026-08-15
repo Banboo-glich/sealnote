@@ -56,6 +56,13 @@
     {% endif %}
   </div>
 
+  {# 気になるリストからの変換件数。0件のときは出さない（要件21-9） #}
+  {% if summary.from_wish_count %}
+  <p class="from-wish" data-reveal>
+    気になるリストから<span class="num">{{ summary.from_wish_count }}</span>つ見ました
+  </p>
+  {% endif %}
+
   {# 3. 最も多かったカテゴリ #}
   {% if summary.top_category %}
   <p class="top-cat" data-reveal>
