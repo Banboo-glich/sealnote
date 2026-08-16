@@ -3,7 +3,7 @@
    - HTMLはキャッシュしない（古い記録が表示される事故を防ぐ）
    - CSS等を変更したら VERSION を上げる。activate で旧キャッシュを削除する */
 
-const VERSION = "v7";
+const VERSION = "v8";
 const CACHE_NAME = "sealnote-" + VERSION;
 
 // 事前キャッシュする静的アセット（HTMLは含めない）

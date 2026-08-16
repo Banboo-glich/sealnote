@@ -28,6 +28,7 @@
   --cat-music: var(--sage);
   --cat-youtube: var(--rose);
   --cat-drama: var(--lavender);
+  --cat-game: var(--sage);
   --cat-other: var(--ink-soft);
 }
 
@@ -375,6 +376,7 @@ a { color: inherit; text-decoration: none; }
 .cat--music { --cat: var(--cat-music); }
 .cat--youtube { --cat: var(--cat-youtube); }
 .cat--drama { --cat: var(--cat-drama); }
+.cat--game { --cat: var(--cat-game); }
 .cat--other { --cat: var(--cat-other); }
 
 .cicon { display: block; }
